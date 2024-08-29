@@ -1,0 +1,31 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    userid                     Int      @id @default(autoincrement())
+    createAt                   DateTime @default(now()) @db.Timestamptz(3)
+    updateAt                   DateTime @updatedAt
+    email                      String   @unique @db.VarChar(255)
+    username                   String   @db.VarChar(65)
+    password                   String   @db.VarChar(255)
+    role                       String   @default("user")
+    lastLogin                  DateTime @default(now())
+    isVerified                 Boolean  @default(false)
+    restePasswordToken         String?  @default("null") @db.VarChar(100)
+    restePasswordExpiresAt     DateTime @default(now()) @db.Timestamptz(3)
+    verificationToken          String   @db.VarChar(10)
+    verificationTokenExpiresAt DateTime @db.Timestamp()
+    passUpdateAt               DateTime @default(now()) @db.Timestamptz(3) //Pour la securité du compte empêche l'utulisation d'un token apres le changement du mot de passe
+}
