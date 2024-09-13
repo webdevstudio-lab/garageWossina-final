@@ -1,7 +1,7 @@
 -- CreateTable
 CREATE TABLE "User" (
     "userid" SERIAL NOT NULL,
-    "createAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" TIMESTAMP(3) NOT NULL,
     "email" VARCHAR(255) NOT NULL,
     "username" VARCHAR(65) NOT NULL,
@@ -10,10 +10,11 @@ CREATE TABLE "User" (
     "lastLogin" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "isVerified" BOOLEAN NOT NULL DEFAULT false,
     "restePasswordToken" VARCHAR(100) DEFAULT 'null',
-    "restePasswordExpiresAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "restePasswordExpiresAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "verificationToken" VARCHAR(10) NOT NULL,
     "verificationTokenExpiresAt" TIMESTAMP NOT NULL,
-    "passUpdateAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "refreshToken" VARCHAR(255) NOT NULL DEFAULT 'null',
+    "passUpdateAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("userid")
 );

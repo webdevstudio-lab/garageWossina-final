@@ -27,5 +27,129 @@ model User {
     restePasswordExpiresAt     DateTime @default(now()) @db.Timestamptz(3)
     verificationToken          String   @db.VarChar(10)
     verificationTokenExpiresAt DateTime @db.Timestamp()
+    refreshToken               String   @default("null") @db.VarChar(255)
     passUpdateAt               DateTime @default(now()) @db.Timestamptz(3) //Pour la securité du compte empêche l'utulisation d'un token apres le changement du mot de passe
+
+    @@map("user")
+}
+
+model Client {
+    id       Int      @id @default(autoincrement())
+    createAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+
+    name     String @db.VarChar(255)
+    phone    String @unique @db.VarChar(20)
+    email    String @db.VarChar(255)
+    address  String @db.VarChar(255)
+    logo     String @db.VarChar(255)
+    password String @db.VarChar(255)
+    type     String @db.VarChar(255)
+
+    devis   Devis[]   @relation("client_devis")
+    facture Facture[] @relation("client_facture")
+
+    @@map("client")
+}
+
+model Devis {
+    id       Int      @id @default(autoincrement())
+    createAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+
+    numDevis    String       @db.VarChar(255)
+    total       Float        @default(0)
+    matricule   String       @db.VarChar(255)
+    description String       @db.VarChar(1000)
+    hasFacture  Boolean      @default(false)
+    clientId    Int
+    clientDevis Client       @relation("client_devis", fields: [clientId], references: [id], onUpdate: Cascade, onDelete: NoAction)
+    devisItem   ItemsDevis[] @relation("devisItem")
+
+    @@map("devis")
+}
+
+model Facture {
+    id       Int      @id @default(autoincrement())
+    createAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+
+    numFacture  String @db.VarChar(255)
+    total       Float  @default(0)
+    matricule   String @db.VarChar(255)
+    description String @db.VarChar(1000)
+    etat        String @default("En Attente") @db.VarChar(255)
+    numDevis    String @default("NA") @db.VarChar(255)
+
+    clientId      Int
+    clientFacture Client         @relation("client_facture", fields: [clientId], references: [id], onUpdate: Cascade, onDelete: NoAction)
+    factureItem   ItemsFacture[] @relation("factureItem")
+
+    @@map("facture")
+}
+
+model ItemsFacture {
+    itemId   Int      @id @default(autoincrement())
+    createAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+
+    description String
+    quantity    Int
+    unitePrice  Int
+    total       Int
+
+    factureId   Int
+    factureItem Facture @relation("factureItem", fields: [factureId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+    @@map("itemsFactures")
+}
+
+model ItemsDevis {
+    itemId   Int      @id @default(autoincrement())
+    createAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+
+    description String
+    quantity    Int
+    unitePrice  Int
+    total       Int
+
+    devisId   Int
+    devisItem Devis @relation("devisItem", fields: [devisId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+    @@map("itemDevis")
+}
+
+model Setting {
+    userid   Int      @id @default(autoincrement())
+    createAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+
+    FactureYear Int
+    DevisYear   Int
+
+    factureRemise Float
+    devisRemise   Float
+
+    Reduction Float
+
+    Taxe Float
+
+    @@map("setting")
+}
+
+model vehicule {
+    id       Int      @id @default(autoincrement())
+    createAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+
+    matricule   String   @unique @db.VarChar(255)
+    marque      String   @db.VarChar(20)
+    description String   @db.VarChar(1000)
+    dateVisite  DateTime
+    nomClient   String   @db.VarChar(255)
+    contact     String   @db.VarChar(255)
+    kilometrage Int
+
+    @@map("vehicile")
 }

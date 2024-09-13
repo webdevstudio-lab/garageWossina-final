@@ -75,3 +75,17 @@ exports.isActivate = async (req, res, next) => {
   }
   next();
 };
+
+//VERIFICATION ADMIN
+exports.isAdmin = async (req, res, next) => {
+  const userAdmin = req.user.role;
+  if (userAdmin === 'user') {
+    return next(
+      res.status(401).json({
+        success: false,
+        message: "Vous n'etes pas autotisé a éffectuer cette action",
+      }),
+    );
+  }
+  next();
+};

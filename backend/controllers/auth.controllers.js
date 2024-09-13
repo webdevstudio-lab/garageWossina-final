@@ -9,7 +9,10 @@ const jwt = require('jsonwebtoken');
 /**********************************************/
 /***********  Import external modules ******************/
 const generateVerificationCode = require('../utils/generateVerificationCode');
-const generateTokenAndSetCookie = require('../utils/generateTokenAndSetCookie');
+const {
+  generateTokenAndSetCookie,
+  generateRefreshTokenAndSetCookie,
+} = require('../utils/generateTokenAndSetCookie');
 const sendVerificationToken = require('../middlewares/sendEmail/sendVerificationToken');
 const sendWelcomeEmail = require('../middlewares/sendEmail/sendWelcomeEmail');
 const sendResetPasswordToken = require('../middlewares/sendEmail/sendResetPasswordToken');
@@ -20,18 +23,18 @@ exports.singup = async (req, res, next) => {
   const { email, username, password } = req.body;
   try {
     //On verifie que tous les champs sois bien remplire
-    if (!email.trim() || !password.trim() || !username.trim()) {
+    if (!email || !password || !username) {
       throw new Error('Veuillez renseigner tous les champs SVP!');
     }
 
     //On verifive si c'est bien un email qui a ete renseigner
-    if (!validator.isEmail(email.trim())) {
+    if (!validator.isEmail(email)) {
       throw new Error("Format de l'address email invalide!");
     }
 
     //on verife si l'utilistauer exista deja
     const userExist = await prisma.user.findUnique({
-      where: { email: email.trim() },
+      where: { email: email },
     });
 
     if (userExist) {
@@ -42,7 +45,7 @@ exports.singup = async (req, res, next) => {
     }
 
     // on crypte le mot de pas de l'ustilisateur
-    const hashPassword = await bcrypt.hash(password.trim(), 10);
+    const hashPassword = await bcrypt.hash(password, 10);
 
     // on genere un code pour la verification de l'email
     const verificationToken = generateVerificationCode();
@@ -52,18 +55,19 @@ exports.singup = async (req, res, next) => {
     const verificationTokenExpiresAt = new Date(expiresAt).toISOString();
 
     //On envoi le code verification de l'email a l'email renseigner par l'utilisateur
-    await sendVerificationToken(email, username, verificationToken);
+    // await sendVerificationToken(email, username, verificationToken);
 
     //on enregistre l'utilisateur
     const newUser = await prisma.user.create({
       data: {
-        email: email.trim(),
-        username: username.trim(),
+        email: email,
+        username: username,
         password: hashPassword,
         verificationToken,
         verificationTokenExpiresAt,
       },
     });
+
     //On gener un Cookie pour la session de l'utilisateur qui vient d'etre crée
     generateTokenAndSetCookie(
       newUser,
@@ -116,7 +120,7 @@ exports.verifyEmail = async (req, res, next) => {
       },
     });
     //On envoie un email de bienvenue
-    await sendWelcomeEmail(user.email, user.username);
+    // await sendWelcomeEmail(user.email, user.username);
 
     return res.status(200).json({
       success: true,
