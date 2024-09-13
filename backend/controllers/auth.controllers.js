@@ -55,7 +55,7 @@ exports.singup = async (req, res, next) => {
     const verificationTokenExpiresAt = new Date(expiresAt).toISOString();
 
     //On envoi le code verification de l'email a l'email renseigner par l'utilisateur
-    // await sendVerificationToken(email, username, verificationToken);
+    await sendVerificationToken(email, username, verificationToken);
 
     //on enregistre l'utilisateur
     const newUser = await prisma.user.create({
@@ -120,7 +120,7 @@ exports.verifyEmail = async (req, res, next) => {
       },
     });
     //On envoie un email de bienvenue
-    // await sendWelcomeEmail(user.email, user.username);
+    await sendWelcomeEmail(user.email, user.username);
 
     return res.status(200).json({
       success: true,

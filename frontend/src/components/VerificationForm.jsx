@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { LoaderCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '../stores/authStore';
-import { toast } from 'react-hot-toast';
+// import { toast } from 'react-hot-toast';
 
 const VerificationForm = () => {
   const [code, setCode] = useState(['', '', '', '', '', '']);
